@@ -9,17 +9,7 @@ from sklearn import model_selection
 from sklearn import svm
 import pickle
 import pandas as pd
-import re
-
-
-def clean_text(text):
-    """
-    清理数据,正则方式,去除标点符号等
-    :param text:
-    :return:
-    """
-    text = re.sub(r'["\' ?!【】\[\]./%：:&()=，,<>+_；;\-*]+', " ", text)
-    return text
+import text_preprocess as tp
 
 
 class SVM(object):
@@ -57,6 +47,7 @@ class SVM(object):
         :param text: 要分类的文本
         :return: 返回分类
         """
+        text = tp.clean_text(text)
         tf_vector = self.tf_idf_model.transform([text])
         chi_vector = self.chi_model.transform(tf_vector)
         out = self.clf_model.predict(chi_vector)
@@ -95,14 +86,16 @@ class SVM(object):
         stop_words = [word.strip() for word in stop_words]
         return stop_words
 
-    def train_model(self,test_size):
+    def train_model(self, test_size):
         """
         训练模型,简单地将生成的TF-IDF数据,chi提取后的特征,以及svm算法模型写入到了磁盘中
         :return: 返回训练好的模型
         """
         data_set = pd.read_table(self.train_path, sep='##', encoding='utf-8', header=None)
+        data_set[0] = [tp.clean_text(data) for data in data_set[0]]
         tf_idf_model = TfidfVectorizer(smooth_idf=True, ngram_range=(1, 1), binary=True, use_idf=True, norm='l2',
-                                       sublinear_tf=True)
+                                       sublinear_tf=True, stop_words=self.stop_words)
+
         tf_vectors = tf_idf_model.fit_transform(data_set[1])
         file = open(self.tf_model_path, "wb")
         pickle.dump(tf_idf_model, file)
@@ -115,9 +108,10 @@ class SVM(object):
         pickle.dump(chi_model, file)
         file.close()
 
-        x_train, x_test, y_train, y_test = model_selection.train_test_split(chi_features, data_set[0], test_size=test_size,
+        x_train, x_test, y_train, y_test = model_selection.train_test_split(chi_features, data_set[0],
+                                                                            test_size=test_size,
                                                                             random_state=42, shuffle=True)
-        clf_model = svm.SVC(kernel='linear')        # 这里采用的是线性分类模型,如果采用rbf径向基模型,速度会非常慢.
+        clf_model = svm.SVC(kernel='linear')  # 这里采用的是线性分类模型,如果采用rbf径向基模型,速度会非常慢.
         clf_model.fit(x_train, y_train)
         score = clf_model.score(x_test, y_test)
 
@@ -130,7 +124,6 @@ class SVM(object):
 
 
 if __name__ == '__main__':
-
     svm_model = SVM('data/aclImdb.txt', 'data/stop/stopwords.txt', 'models/svm/tf_model.pickle',
                     'models/svm/chi_model.pickle',
                     'models/svm/clf_model.pickle')
