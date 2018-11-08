@@ -102,7 +102,7 @@ class SVM(object):
         """
         data_set = pd.read_table(self.train_path, sep='##', encoding='utf-8', header=None)
         tf_idf_model = TfidfVectorizer(smooth_idf=True, ngram_range=(1, 1), binary=True, use_idf=True, norm='l2',
-                                       sublinear_tf=True, stop_words=self.stop_words)
+                                       sublinear_tf=True)
         tf_vectors = tf_idf_model.fit_transform(data_set[1])
         file = open(self.tf_model_path, "wb")
         pickle.dump(tf_idf_model, file)
