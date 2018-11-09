@@ -6,5 +6,11 @@
 
 ### 1) SVM算法
 
-* 运用线性分类模型进行分类,取得了88%的分类准确率,有点烂,待优化.
+* 运用线性分类模型进行分类.
+
+```python
+svm_model = SVM('data/aclImdb.txt', 'data/stop/stopwords.txt', 'models/svm/tf_model.pickle',
+                    'models/svm/chi_model.pickle',
+                    'models/svm/clf_model.pickle')
+```
 
