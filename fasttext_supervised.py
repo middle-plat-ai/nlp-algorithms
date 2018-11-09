@@ -1,12 +1,14 @@
 # coding:utf-8
 
 import fasttext
+from text_preprocess import clean_text
 
 
 class FastText(object):
     """
     利用fasttext来对文本进行分裂
     """
+
     def __init__(self, train_path, test_path, model_path):
         """
         初始化
@@ -18,6 +20,31 @@ class FastText(object):
         self.test_path = test_path
         self.model_path = model_path
         self.model = None
+        self.clean()
+        pass
+
+    def clean(self):
+        with open(self.train_path, 'r', encoding='utf8') as train:
+            lines = train.readlines()
+            train_lines = []
+            for line in lines:
+                line_list = line.split('__label__')
+                l = clean_text(line_list[0]) + '__label__' + line_list[1]
+                train_lines.append(l)
+
+        with open(self.train_path, 'w', encoding='utf8') as train:
+            train.writelines(train_lines)
+
+        with open(self.test_path, 'r', encoding='utf8') as test:
+            lines1 = test.readlines()
+            test_lines = []
+            for line in lines1:
+                line_list = line.split('__label__')
+                l = clean_text(line_list[0]) + '__label__' + line_list[1]
+                test_lines.append(l)
+        with open(self.test_path, 'w', encoding='utf8') as test:
+            test.writelines(test_lines)
+        pass
 
     def train(self):
         """

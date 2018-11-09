@@ -5,7 +5,7 @@ from sanic.response import json
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import chi2
-from sklearn import model_selection
+from sklearn.model_selection import train_test_split
 from sklearn import svm
 import pickle
 import pandas as pd
@@ -93,24 +93,28 @@ class SVM(object):
         """
         data_set = pd.read_table(self.train_path, sep='##', encoding='utf-8', header=None)
         data_set[0] = [tp.clean_text(data) for data in data_set[0]]
+
         tf_idf_model = TfidfVectorizer(smooth_idf=True, ngram_range=(1, 1), binary=True, use_idf=True, norm='l2',
                                        sublinear_tf=True, stop_words=self.stop_words)
-
         tf_vectors = tf_idf_model.fit_transform(data_set[1])
+        print('---------tf-idf---------' + str(tf_vectors.shape[1]))
+
         file = open(self.tf_model_path, "wb")
         pickle.dump(tf_idf_model, file)
         file.close()
 
-        chi_model = SelectKBest(chi2, k=5000).fit(tf_vectors, data_set[0])
+        chi_model = SelectKBest(chi2, k=10000).fit(tf_vectors, data_set[0])
         chi_features = chi_model.transform(tf_vectors)
+
+        print('-----------chi---------' + str(chi_features.shape[1]))
 
         file = open(self.chi_model_path, "wb")
         pickle.dump(chi_model, file)
         file.close()
 
-        x_train, x_test, y_train, y_test = model_selection.train_test_split(chi_features, data_set[0],
-                                                                            test_size=test_size,
-                                                                            random_state=42, shuffle=True)
+        x_train, x_test, y_train, y_test = train_test_split(chi_features, data_set[0],
+                                                            test_size=test_size,
+                                                            random_state=42, shuffle=True)
         clf_model = svm.SVC(kernel='linear')  # 这里采用的是线性分类模型,如果采用rbf径向基模型,速度会非常慢.
         clf_model.fit(x_train, y_train)
         score = clf_model.score(x_test, y_test)
