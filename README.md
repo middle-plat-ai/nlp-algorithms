@@ -6,7 +6,7 @@
 
 ### 1) SVM算法
 
-* 运用线性分类模型进行分类.
+* 运用线性分类模型进行分类, 在文件svm_sklearn.py里.
 
 ```python
 svm_model = SVM('data/aclImdb.txt', 'data/stop/stopwords.txt', 'models/svm/tf_model.pickle',
