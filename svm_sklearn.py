@@ -20,21 +20,19 @@ class SVM(object):
     3. 用SVM进行分类训练
     """
 
-    def __init__(self, train_path, stop_path, tf_model_path, chi_model_path, clf_model_path):
+    def __init__(self, train_path, stop_path, model_path):
         """
         初始化参数
         :param train_path: 训练路径
         :param stop_path: 停用词路径
-        :param tf_model_path: tf_idf模型保存路径
-        :param chi_model_path: 卡方检验模型保存路径
-        :param clf_model_path: SVM模型保存路径
+        :param model_path: 模型保存路径
         """
         self.stop_path = stop_path
         self.stop_words = self.init_stopwords()
         self.train_path = train_path
-        self.tf_model_path = tf_model_path
-        self.chi_model_path = chi_model_path
-        self.clf_model_path = clf_model_path
+        self.tf_model_path = model_path + "/tf_model.pickle"
+        self.chi_model_path = model_path + "/chi_model.pickle"
+        self.clf_model_path = model_path + "/clf_model.pickle"
 
         # 先读取训练好的models,如果读取不到,则重新训练
         self.tf_idf_model, self.chi_model, self.clf_model = self.read_model()
@@ -92,18 +90,19 @@ class SVM(object):
         :return: 返回训练好的模型
         """
         data_set = pd.read_table(self.train_path, sep='##', encoding='utf-8', header=None)
-        data_set[0] = [tp.clean_text(data) for data in data_set[0]]
+        print(data_set.shape)
+        # data_set[0] = [tp.clean_text(data) for data in data_set[0]]
 
         tf_idf_model = TfidfVectorizer(smooth_idf=True, ngram_range=(1, 1), binary=True, use_idf=True, norm='l2',
-                                       sublinear_tf=True, stop_words=self.stop_words)
-        tf_vectors = tf_idf_model.fit_transform(data_set[1])
+                                       sublinear_tf=True) # , stop_words=self.stop_words
+        tf_vectors = tf_idf_model.fit_transform(data_set[0])
         print('---------tf-idf---------' + str(tf_vectors.shape[1]))
 
         file = open(self.tf_model_path, "wb")
         pickle.dump(tf_idf_model, file)
         file.close()
 
-        chi_model = SelectKBest(chi2, k=10000).fit(tf_vectors, data_set[0])
+        chi_model = SelectKBest(chi2, k=int(tf_vectors.shape[1]/5)).fit(tf_vectors, data_set[1])
         chi_features = chi_model.transform(tf_vectors)
 
         print('-----------chi---------' + str(chi_features.shape[1]))
@@ -112,7 +111,7 @@ class SVM(object):
         pickle.dump(chi_model, file)
         file.close()
 
-        x_train, x_test, y_train, y_test = train_test_split(chi_features, data_set[0],
+        x_train, x_test, y_train, y_test = train_test_split(chi_features, data_set[1],
                                                             test_size=test_size,
                                                             random_state=42, shuffle=True)
         clf_model = svm.SVC(kernel='linear')  # 这里采用的是线性分类模型,如果采用rbf径向基模型,速度会非常慢.
@@ -128,12 +127,9 @@ class SVM(object):
 
 
 if __name__ == '__main__':
-    svm_model = SVM('data/aclImdb.txt', 'data/stop/stopwords.txt', 'models/svm/tf_model.pickle',
-                    'models/svm/chi_model.pickle',
-                    'models/svm/clf_model.pickle')
+    svm_model = SVM('data/aclImdb.txt', 'data/stop/stopwords.txt', 'models/svm/')
 
-    # svm_model.train_model()
-    # 启动web
+    # 以下是启动web部分,需要web接口的话,可以取消注释
     # app = Sanic()
     #
     # @app.route("/predict", methods=['POST', 'GET'])

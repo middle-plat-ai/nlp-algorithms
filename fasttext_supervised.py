@@ -6,7 +6,7 @@ from text_preprocess import clean_text
 
 class FastText(object):
     """
-    利用fasttext来对文本进行分裂
+    利用fasttext来对文本进行分类
     """
 
     def __init__(self, train_path, test_path, model_path):
