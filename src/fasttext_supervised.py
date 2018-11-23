@@ -1,7 +1,7 @@
 # coding:utf-8
 
 import fasttext
-from text_preprocess import clean_text
+from src.text_preprocess import clean_text
 
 
 class FastText(object):

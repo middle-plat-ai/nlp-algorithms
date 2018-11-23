@@ -1,7 +1,5 @@
 # coding:utf-8
 
-from sanic import Sanic
-from sanic.response import json
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import chi2
@@ -9,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn import svm
 import pickle
 import pandas as pd
-import text_preprocess as tp
+from src import text_preprocess as tp
 
 
 class SVM(object):

@@ -1,4 +1,4 @@
-from svm_sklearn import SVM
+from src.svm_sklearn import SVM
 
 # for i in range(5):
 #     print('第' + str(i) + '个模型')
