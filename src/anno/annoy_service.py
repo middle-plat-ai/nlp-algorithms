@@ -102,7 +102,7 @@ async def predict(request):
     vecs = text.split(' ')
     vecs = [float(vec) for vec in vecs]
 
-    ans = annoy_compare.predict(vecs, 10)
+    ans = annoy_compare.predict(vecs, 3)
 
     if ans:
         return json(ans)

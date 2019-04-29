@@ -1,0 +1,5 @@
+*.txt
+*.ann
+*.h5
+.idea/
+models/
