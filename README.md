@@ -24,3 +24,5 @@ model = BiLSTMAttentionClassifier('data/quora/GoogleNews-vectors-negative300.bin
 print(model.predict_result('this is very good movie, i want to watch it again!'))
 print(model.predict_result('this is very bad movie, i hate it'))
 ```
+
+> 第一次训练的时候, 需要训练好的词向量，如google的， 后边再次训练的时候，train设置为True, 只用训练好的模型做推理的时候，train设置为False
