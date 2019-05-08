@@ -9,8 +9,18 @@
 * 运用线性分类模型进行分类, 在文件svm_sklearn.py里.
 
 ```python
-svm_model = SVM('data/aclImdb.txt', 'data/stop/stopwords.txt', 'models/svm/tf_model.pickle',
-                    'models/svm/chi_model.pickle',
-                    'models/svm/clf_model.pickle')
+from src.svm_sklearn import SVMClassifier
+svm_model = SVMClassifier('model/svm/model.pkl')
 ```
 
+### 2) BiLSTM+Attention
+
+* 双向lstm获取句子的表示，然后用attention机制，最后采用简单的全连接层分类，简单的二分类
+
+```python
+from src.bilstm_attention_classifier import BiLSTMAttentionClassifier
+model = BiLSTMAttentionClassifier('data/quora/GoogleNews-vectors-negative300.bin.gz', 'model/att',
+                                      'model/att/config.pkl', train=True)
+print(model.predict_result('this is very good movie, i want to watch it again!'))
+print(model.predict_result('this is very bad movie, i hate it'))
+```
