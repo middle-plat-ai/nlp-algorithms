@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn import svm
 import pickle
 import pandas as pd
-from src import text_preprocess as tp
+from src.preprocess.clean_text import clean_zh_text
 
 
 class SVM(object):
@@ -43,7 +43,7 @@ class SVM(object):
         :param text: 要分类的文本
         :return: 返回分类
         """
-        text = tp.clean_text(text)
+        text = clean_zh_text(text)
         tf_vector = self.tf_idf_model.transform([text])
         chi_vector = self.chi_model.transform(tf_vector)
         out = self.clf_model.predict(chi_vector)

@@ -1,7 +1,7 @@
 # coding:utf-8
 
 import fasttext
-from src.text_preprocess import clean_text
+from src.preprocess.clean_text import  clean_zh_text
 
 
 class FastText(object):
@@ -29,7 +29,7 @@ class FastText(object):
             train_lines = []
             for line in lines:
                 line_list = line.split('__label__')
-                l = clean_text(line_list[0]) + '__label__' + line_list[1]
+                l = clean_zh_text(line_list[0]) + '__label__' + line_list[1]
                 train_lines.append(l)
 
         with open(self.train_path, 'w', encoding='utf8') as train:
@@ -40,7 +40,7 @@ class FastText(object):
             test_lines = []
             for line in lines1:
                 line_list = line.split('__label__')
-                l = clean_text(line_list[0]) + '__label__' + line_list[1]
+                l = clean_zh_text(line_list[0]) + '__label__' + line_list[1]
                 test_lines.append(l)
         with open(self.test_path, 'w', encoding='utf8') as test:
             test.writelines(test_lines)

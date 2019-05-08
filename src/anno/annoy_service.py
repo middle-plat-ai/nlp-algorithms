@@ -66,7 +66,7 @@ class AnnoyCompare:
         annoy_model = AnnoyIndex(self.vector_len)  # Length of item vector that will be indexed
         for k, v in self.vector_dict.items():
             annoy_model.add_item(k, v)
-        annoy_model.build(100)  # 10 trees
+        annoy_model.build(100)  # 100 trees
         annoy_model.save(self.model_path)
         return annoy_model
 
